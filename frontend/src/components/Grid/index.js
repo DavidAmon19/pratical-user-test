@@ -34,40 +34,58 @@ width: ${(props) => (props.width ? props.width : "auto")};
 
 
 
-const Grid = ({ users }) => {
+const Grid = ({ users, setUsers, setOnEdit }) => {
+    const handleEdit = (item) => {
+      setOnEdit(item);
+    };
+  
+    const handleDelete = async (id) => {
+      await axios
+        .delete("http://localhost:8800/" + id)
+        .then(({ data }) => {
+          const newArray = users.filter((user) => user.id !== id);
+  
+          setUsers(newArray);
+          toast.success(data);
+        })
+        .catch(({ data }) => toast.error(data));
+  
+      setOnEdit(null);
+    };
+  
     return (
-        <Table>
-            <Thead>
-                <Tr>
-                    <Th>Nome</Th>
-                    <Th>Documento</Th>
-                    <Th>Placa</Th>
-                    <Th onlyWeb>Veiculo</Th>
-                    <Th></Th>
-                    <Th></Th>
-                </Tr>
-            </Thead>
-            <Tbody>
-                {users.map((item, i) => (
-                    <Tr key={i}>
-                        <Td width="20%">{item.nome}</Td>
-                        <Td width="20%">{item.documento}</Td>
-                        <Td width="20%">{item.placa}</Td>
-                        <Td width="20%" onlyWeb>
-                            {item.veiculo}
-                        </Td>
-                        <Td alignCenter width="5%">
-                            <FaEdit />
-                        </Td>
-                        <Td alignCenter width="5%">
-                            <FaTrash />
-                        </Td>
-                    </Tr>
-                ))}
-            </Tbody>
-        </Table>
+      <Table>
+        <Thead>
+          <Tr>
+            <Th>Nome</Th>
+            <Th>Documento</Th>
+            <Th onlyWeb>Placa</Th>
+            <Th>Veiculo</Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {users.map((item, i) => (
+            <Tr key={i}>
+              <Td width="30%">{item.nome}</Td>
+              <Td width="30%">{item.documento}</Td>
+              <Td width="20%" onlyWeb>
+                {item.placa}
+              </Td>
+              <Td width="20%" onlyWeb>
+                {item.veiculo}
+              </Td>
+              <Td alignCenter width="10%">
+                <FaEdit style={{cursor:'pointer', paddingRight:'5px'}} onClick={() => handleEdit(item)} />
+              </Td>
+              <Td alignCenter width="10%">
+                <FaTrash style={{cursor:'pointer'}} onClick={() => handleDelete(item.id)} />
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
     );
-};
-
-
-export default Grid;
+  };
+  
+  export default Grid;
